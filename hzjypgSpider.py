@@ -14,7 +14,7 @@ import random
 i = 0
 def send_email():
     my_sender='dyzhl15@126.com'    # 发件人邮箱账号
-    my_pass = 'zgm01432'           # 发件人邮箱密码（是通过邮箱授权smtp的密码，不是邮箱密码）
+    my_pass = '******'           # 发件人邮箱密码（是通过邮箱授权smtp的密码，不是邮箱密码）
     my_user='dyzhl15@126.com'      # 收件人邮箱账号，我这边发送给自己
     def mail():
         ret=True
