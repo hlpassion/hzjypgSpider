@@ -9,6 +9,8 @@ from email.mime.text import MIMEText
 from email.utils import formataddr
 import time
 import random
+from apscheduler.schedulers.blocking import BlockingScheduler
+
 
 
 i = 0
@@ -41,7 +43,7 @@ def send_email():
 TARGET_URL = 'http://www.hzjypg.net:8000/queryExamInfo'
 def getHtml(url, cookie=None):
     header = { 'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding': 'gzip, deflate, sdch', 'Accept-Language': 'zh-CN,zh;q=0.8', }
-    html = requests.get(url=url, headers=header, timeout=30, cookies=cookie)
+    html = requests.get(url=url, headers=header, timeout=300, cookies=cookie)
     return html.text
 def executeJS(js_func_string, arg):
     func = js2py.eval_js(js_func_string)
@@ -74,16 +76,23 @@ def get_real_data():
 
 def send_alert():
     sel = etree.HTML(get_real_data())
-    exam_num = len(sel.xpath('//table[@class="pth_smrtable"]/tr'))
-    if exam_num != 1:
-        send_email()
-        print("Start...")
+    tr_num = len(sel.xpath('//table[@class="pth_smrtable"]/tr'))
+    if tr_num == 2:
+    	print("Running....")
+    	print(time.localtime())
+    	exam_num = sel.xpath('//table[@class="pth_smrtable"]/tr[2]/td[1]/text()')[0]
+    	if exam_num != '1702':
+	        send_email()
+	        print("Start...")
     else:
         global i
         i += 1
         print('the %s times' % str(i))
 
 if __name__ == '__main__':
-    while True:
-        send_alert()
-        time.sleep(3600)
+	scheduler = BlockingScheduler()
+	scheduler.add_job(send_alert, 'interval', seconds=3)
+	scheduler.start()
+    # while True:
+    #     send_alert()
+    #     time.sleep(3600)
